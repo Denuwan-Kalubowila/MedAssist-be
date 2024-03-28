@@ -1,1 +1,59 @@
+# Environment
+venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+
+# Distribution / packaging
+.eggs/
+*.egg-info/
+dist/
+downloads/
+build/
+develop-eggs/
+
+# IDE and editor files
+.idea/
+.vscode/
+.spyderproject/
+
+# Test coverage / reports
+htmlcov/
+.tox/
+.coverage
+.pytest_cache/
+
+# Local version control
+.git/
+.svn/
+*.swp
+
+# Local settings
+local_settings.py
 .env
+
+# Logs
+*.log
+
+# Media / static files (these should be handled in production)
+media/*
+static/*
+
+# Database files
+db.sqlite3  # Replace with your database filename if different
+
+# Documentation
+docs/_build/
+
+# Temporary pytest cache
+*.cache
+
+# Any other IDE or editor specific temporary files
+*.swo # PyCharm
+
+# MyPy/Pyright/Pylint cache
+__mypy_cache__/
+.mypy_cache/
+.pyright/

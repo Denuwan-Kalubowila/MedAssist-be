@@ -1,3 +1,4 @@
+"""This is the Route file of Medassist"""
 from django.contrib import admin
 from django.urls import path, include
 
