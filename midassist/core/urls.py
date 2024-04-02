@@ -3,7 +3,6 @@ from django.urls import path
 from .views import your_view
 from . import views
 
-
 urlpatterns = [
     path('your-endpoint/', your_view, name='your_view'),
     path('test-database/', views.testdb),
@@ -11,4 +10,5 @@ urlpatterns = [
     path('create-value/', views.create_value),
     path('test-database/<str:pk>/update', views.update_value),
     path('test-database/<str:pk>/delete', views.delete_value),
+    path('sign-up/', views.sign_up),
 ]

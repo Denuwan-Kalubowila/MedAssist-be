@@ -59,8 +59,8 @@ WSGI_APPLICATION = 'midassist.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'TestDB',
+        'ENGINE': os.getenv('DETABASE_ENGINE'),
+        'NAME': os.getenv('DETABASE_NAME'),
     }
 }
 
