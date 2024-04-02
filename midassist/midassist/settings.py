@@ -1,4 +1,4 @@
-"""The main setting file of MedAssit programm"""
+"""The main setting file of MedAssist programme"""
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,8 +59,8 @@ WSGI_APPLICATION = 'midassist.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'TestDB',
+        'ENGINE': os.getenv('DETABASE_ENGINE'),
+        'NAME': os.getenv('DETABASE_NAME'),
     }
 }
 

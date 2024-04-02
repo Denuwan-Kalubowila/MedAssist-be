@@ -1,7 +1,8 @@
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import TestDBSerializer
-from .models import TestDB
+from .serializers import TestDBSerializer, MemberSerializer
+from .models import TestDB, Member
 
 
 @api_view(['GET'])
@@ -58,3 +59,12 @@ def delete_value(request, pk):
     test_db = TestDB.objects.get(id=pk)
     test_db.delete()
     return Response('Delete')
+
+
+@api_view(['POST'])
+def sign_up(request):
+    serializer = MemberSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
