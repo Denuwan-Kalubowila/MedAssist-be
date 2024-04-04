@@ -2,25 +2,10 @@
 This module represent the models of MedAssist
 """
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 # Create your models here.
-
-class TestDB(models.Model):
-    body = models.TextField()
-    update = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.body[0:50]
-
-    class Meta:
-        """
-        Test Meta Data
-        """
-        ordering = ['-update']
-
-
 class Member(models.Model):
     """
     Member Model Fields
@@ -44,3 +29,14 @@ class Member(models.Model):
         Member Meta Data
         """
         ordering = ['created']
+
+
+# core/models.py
+
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
+
+    # Add custom fields here, if needed
+
+    def __str__(self):
+        return self.username
