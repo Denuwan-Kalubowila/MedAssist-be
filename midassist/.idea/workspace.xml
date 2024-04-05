@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c14dd320-9eed-4eba-beed-ab159cbcc92d" name="Changes" comment="" />
+    <list default="true" id="c14dd320-9eed-4eba-beed-ab159cbcc92d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/midassist/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/midassist/settings.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,6 +58,7 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="midassist.settings" />
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
@@ -86,6 +96,10 @@
       <workItem from="1711900809000" duration="1218000" />
       <workItem from="1711983488496" duration="1530000" />
       <workItem from="1712062315497" duration="391000" />
+      <workItem from="1712294831837" duration="932000" />
+      <workItem from="1712299615368" duration="13000" />
+      <workItem from="1712299736932" duration="626000" />
+      <workItem from="1712319383677" duration="2099000" />
     </task>
     <servers />
   </component>
