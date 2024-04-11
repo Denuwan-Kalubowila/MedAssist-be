@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
+from rest_framework.authtoken.models import Token
 
 
 @api_view(['POST'])
@@ -13,13 +14,16 @@ from .serializers import UserSerializer
 def login_view(request):
     email = request.data.get('email')
     password = request.data.get('password')
-    user = authenticate(request, email=email, password=password)
-    if user is not None:
-        login(request, user)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+
+    user = User.objects.filter(email=email).first()
+
+    if user:
+        if user.password == password:
+            return Response({'message': 'Login successful'}, status=200)
+        else:
+            return Response({'error': 'Incorrect password'}, status=401)
     else:
-        return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Email not found'}, status=404)
 
 
 @api_view(['POST'])
