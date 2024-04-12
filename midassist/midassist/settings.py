@@ -59,8 +59,8 @@ WSGI_APPLICATION = 'midassist.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DETABASE_ENGINE'),
-        'NAME': os.getenv('DETABASE_NAME'),
+        'ENGINE':os.getenv('DATABASE_ENGINE'),
+        'NAME': os.getenv('DATABASE_NAME'),
     }
 }
 

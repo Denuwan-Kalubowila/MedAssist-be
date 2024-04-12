@@ -1,0 +1,8 @@
+Django
+django-environ
+djangorestframework
+pytz
+pymongo==3.12.1
+djongo
+django-cors-headers
+
