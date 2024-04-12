@@ -34,3 +34,10 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+
+class Post(models.Model):
+    image = models.ImageField(upload_to='post_images')
+
+    def __str__(self):
+        return self.image
