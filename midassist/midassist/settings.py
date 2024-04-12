@@ -94,3 +94,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = "core.User"
+
+# Actual directory user files go to
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# URL used to access the media
+MEDIA_URL = '/media/'
