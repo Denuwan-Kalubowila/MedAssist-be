@@ -1,13 +1,13 @@
 """
 This is the view of core module
 """
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserSerializer
-from rest_framework.authtoken.models import Token
+from .models import User
 
 @api_view(['POST'])
 @csrf_exempt
