@@ -4,6 +4,10 @@ This is the view of core module
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from .serializers import PostSerializer
+from .models import Post
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserSerializer
@@ -51,3 +55,22 @@ def signup_view(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_image(request):
+    posts = Post.objects.all()
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def post_image(request):
+    posts_serializer = PostSerializer(data=request.data)
+    if posts_serializer.is_valid():
+        posts_serializer.save()
+        return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        print('error', posts_serializer.errors)
+        return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
