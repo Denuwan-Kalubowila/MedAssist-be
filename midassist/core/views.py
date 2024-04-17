@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from .models import Post, User, Doctor
 from .serializers import PostSerializer, DoctorSerializer
 from .serializers import UserSerializer
+from .models import User
 
 
 @api_view(['POST'])
