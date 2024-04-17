@@ -3,15 +3,14 @@ This is the view of core module
 """
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from .serializers import PostSerializer
-from .models import Post
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Post, User, Doctor
+from .serializers import PostSerializer, DoctorSerializer
 from .serializers import UserSerializer
 from .models import User
+
 
 @api_view(['POST'])
 @csrf_exempt
@@ -26,7 +25,8 @@ def login_view(request):
 
     if user:
         if user.password == password:
-            return Response({'message': 'Login successful'}, status=200)
+            user_id = user.id
+            return Response({'message': 'Login successful', 'user_id': user_id}, status=200)
         else:
             return Response({'error': 'Incorrect password'}, status=401)
     else:
@@ -74,3 +74,9 @@ def post_image(request):
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
+def doctors_view(request):
+    doctors = Doctor.objects.all()  # Retrieve all doctors from the database
+    serializer = DoctorSerializer(doctors, many=True)
+    return Response(serializer.data)

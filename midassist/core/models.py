@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=30)
-    age = models.IntegerField(max_length=3)
+    age = models.IntegerField()
     phone_number = models.CharField(max_length=10)
     is_active = models.BooleanField(default=True)
     is_doctor = models.BooleanField(default=False)
@@ -38,6 +38,20 @@ class User(AbstractBaseUser):
 
 class Post(models.Model):
     image = models.ImageField(upload_to='post_images')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.image
+
+
+class Doctor(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=30)
+    phone_number = models.CharField(max_length=10)
+    specialties = models.CharField(max_length=15)
+    about = models.CharField(max_length=45)
+    time = models.CharField(max_length=20)
+    experience = models.CharField(max_length=5)
+
+    def __str__(self):
+        return self.email
