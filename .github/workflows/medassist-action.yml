@@ -18,9 +18,10 @@ jobs:
         run: |
           cd midassist
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Apply Migrations
         run: |
+          cd midassist
           python manage.py makemigrations
           python manage.py migrate
       - name: Run Tests
