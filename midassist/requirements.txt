@@ -1,8 +1,8 @@
 Django
 django-environ
 djangorestframework
-pytz
-pymongo==3.12.1
-djongo
 django-cors-headers
+djongo
+pymongo==3.12.1
+pytz
 python-dotenv
