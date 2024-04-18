@@ -1,4 +1,4 @@
-Django
+django
 django-environ
 djangorestframework
 pytz
