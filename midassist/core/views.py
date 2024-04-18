@@ -11,6 +11,8 @@ from .serializers import PostSerializer, DoctorSerializer
 from .serializers import UserSerializer
 from .models import User
 
+user_id = 0
+
 
 @api_view(['POST'])
 @csrf_exempt
@@ -18,6 +20,8 @@ def login_view(request):
     """
         this method use for login
     """
+    global user_id
+
     email = request.data.get('email')
     password = request.data.get('password')
 
@@ -26,6 +30,7 @@ def login_view(request):
     if user:
         if user.password == password:
             user_id = user.id
+            print(user_id)
             return Response({'message': 'Login successful', 'user_id': user_id}, status=200)
         else:
             return Response({'error': 'Incorrect password'}, status=401)
@@ -39,6 +44,9 @@ def logout_view(request):
     """
         this method use for logout
     """
+    global user_id
+    user_id = 0
+    print(user_id)
     logout(request)
     return Response({'success': 'Logged out successfully'})
 
@@ -55,6 +63,24 @@ def signup_view(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def user_details(request):
+    """
+    Retrieve details of the logged-in user
+    """
+    global user_id
+    print(user_id)
+    if user_id:
+        user = User.objects.filter(id=user_id).first()
+        if user:
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'User not found'}, status=404)
+    else:
+        return Response({'error': 'User session not found'}, status=404)
 
 
 @api_view(['GET'])
