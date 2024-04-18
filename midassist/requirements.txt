@@ -5,3 +5,4 @@ pytz
 pymongo==3.12.1
 djongo
 django-cors-headers
+python-dotenv
