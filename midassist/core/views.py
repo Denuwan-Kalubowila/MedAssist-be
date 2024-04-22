@@ -7,9 +7,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Post, User, Doctor
-from .serializers import PostSerializer, DoctorSerializer
+from .serializers import PostSerializer, DoctorSerializer,MessageSerializer
 from .serializers import UserSerializer
 from .models import User
+from .chat import get_response_medassist
 
 user_id = 0
 
@@ -106,3 +107,14 @@ def doctors_view(request):
     doctors = Doctor.objects.all()  # Retrieve all doctors from the database
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+def chat(request):
+    user_msg_serializer= MessageSerializer(data=request.data)
+    if user_msg_serializer.is_valid():
+        user_msg=user_msg_serializer.data
+        print(user_msg)
+    else:
+        print('error', user_msg_serializer.errors)
+        return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    

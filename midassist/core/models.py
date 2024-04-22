@@ -56,3 +56,8 @@ class Doctor(models.Model):
 
     def __str__(self):
         return self.email
+    
+class Message(models.Model):
+    msg = models.ImageField(upload_to='post_images')
+    def __str__(self):
+        return self.msg

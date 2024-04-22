@@ -1,6 +1,7 @@
 from rest_framework import serializers, viewsets
 from .models import User, Doctor
 from .models import Post
+from .models import Message
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,5 +19,10 @@ class PostSerializer(serializers.ModelSerializer):
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
+        fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
         fields = '__all__'
 
