@@ -45,6 +45,6 @@ def get_response_medassist(user_message):
         response = chat.send_message(user_message,**parameters)
         return response.text
     except Exception as e:
-        print(f"Error getting response: {e} {user_message}")
+        print(f"Error getting response: {e}")
         return "An error occurred. Please try again later."
 
