@@ -16,7 +16,9 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-
+      - name: Set MongoDB connection string
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
