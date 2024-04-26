@@ -1,12 +1,12 @@
+import os
 import vertexai 
 from vertexai.language_models import ChatModel
 from vertexai import generative_models
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-vertexai.init(project=os.dotenv('PROJECT'), location=os.dotenv('LOCATION'))
+vertexai.init(project=os.getenv('PROJECT'), location=os.getenv('LOCATION'))
 chat_model = ChatModel.from_pretrained("chat-bison")
 parameters = {
   "candidate_count": 1,
@@ -26,9 +26,25 @@ chat = chat_model.start_chat(
      use simple English for understanding instructions to patient."""
 )
 
-def get_response_medassist(request):
-    """This method use for get response form vertexai model"""
-    response=chat.send_message(request)
-    return response
+def get_response_medassist(user_message):
+    """
+    Gets a response from the Vertex AI chat model.
 
+    Args:
+        user_message (str): User's message to the chatbot.
+
+    Returns:
+        str: The model's generated response.
+    """
+
+    try:
+        # Ensure user_message is a string
+        if not isinstance(user_message, str):
+            raise ValueError("user_message must be a string")
+
+        response = chat.send_message(user_message,**parameters)
+        return response.text
+    except Exception as e:
+        print(f"Error getting response: {e} {user_message}")
+        return "An error occurred. Please try again later."
 
