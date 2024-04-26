@@ -1,7 +1,19 @@
 name: MedAssist Build
 on: push
 jobs: 
+  setup-mongodb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install MongoDB
+        run: |
+          sudo apt update
+          sudo apt install -y mongodb
+          sudo systemctl start mongodb
+          sudo systemctl enable mongodb
+          sudo systemctl status mongodb
+          
   build:
+    needs: setup-mongodb
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
