@@ -83,11 +83,11 @@ def user_details(request):
         return Response({'error': 'User session not found'}, status=404)
 
 
-# @api_view(['GET'])
-# def get_image(request):
-#     posts = Post.objects.all()
-#     serializer = PostSerializer(posts, many=True)
-#     return Response(serializer.data)
+@api_view(['GET'])
+def get_image(request):
+    posts = Post.objects.all()
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -101,11 +101,11 @@ def post_image(request):
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @api_view(['GET'])
-# def doctors_view(request):
-#     doctors = Doctor.objects.all()  # Retrieve all doctors from the database
-#     serializer = DoctorSerializer(doctors, many=True)
-#     return Response(serializer.data)
+@api_view(['GET'])
+def doctors_view(request):
+    doctors = Doctor.objects.all()  # Retrieve all doctors from the database
+    serializer = DoctorSerializer(doctors, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def chat(request):

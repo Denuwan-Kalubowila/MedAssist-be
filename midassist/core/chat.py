@@ -1,3 +1,7 @@
+"""
+  Description:
+    This module repesent the chat feature of the MedAssit .
+"""
 import os
 import vertexai 
 from vertexai.language_models import ChatModel
@@ -38,7 +42,6 @@ def get_response_medassist(user_message):
     """
 
     try:
-        # Ensure user_message is a string
         if not isinstance(user_message, str):
             raise ValueError("user_message must be a string")
 
