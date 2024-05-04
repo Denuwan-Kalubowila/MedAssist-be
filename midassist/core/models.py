@@ -36,12 +36,20 @@ class User(AbstractBaseUser):
         return self.email
 
 
-class Post(models.Model):
+class Image(models.Model):
     image = models.ImageField(upload_to='post_images')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.image
+
+
+class Pdf(models.Model):
+    pdf_file = models.FileField(upload_to='post_pdfs')  # Change from ImageField to FileField
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.pdf_file)
 
 
 class Doctor(models.Model):

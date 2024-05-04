@@ -6,8 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Post, User, Doctor
-from .serializers import PostSerializer, DoctorSerializer,MessageSerializer
+from .models import Image, User, Doctor
+from .serializers import ImageSerializer, DoctorSerializer, PdfSerializer
 from .serializers import UserSerializer
 from .chat import get_response_medassist
 
@@ -85,20 +85,38 @@ def user_details(request):
 
 @api_view(['GET'])
 def get_image(request):
-    posts = Post.objects.all()
-    serializer = PostSerializer(posts, many=True)
+    posts = Image.objects.all()
+    serializer = ImageSerializer(posts, many=True)
     return Response(serializer.data)
 
 
 @api_view(['POST'])
 def post_image(request):
-    posts_serializer = PostSerializer(data=request.data)
+    posts_serializer = ImageSerializer(data=request.data)
     if posts_serializer.is_valid():
         posts_serializer.save()
         return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
     else:
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def post_pdf(request):
+    if request.method == 'POST':
+        pdf_file = request.data.get('pdf_file')
+        user = request.user  # Assuming you are using authentication
+        post_data = {'pdf_file': pdf_file, 'user': user.id}
+        post_serializer = PdfSerializer(data=post_data)
+
+        if post_serializer.is_valid():
+            post_serializer.save()
+            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', post_serializer.errors)
+            return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(['GET'])
