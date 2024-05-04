@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Image, User, Doctor
-from .serializers import ImageSerializer, DoctorSerializer, PdfSerializer
-from .serializers import UserSerializer
+from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
+from .serializers import UserSerializer, DoctorSerializer
 from .chat import get_response_medassist
 
 user_id = 0

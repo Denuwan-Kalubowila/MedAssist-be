@@ -1,6 +1,5 @@
 from rest_framework import serializers, viewsets
 from .models import User, Doctor
-from .models import Post
 from .models import Message
 from .models import Pdf
 from .models import Image

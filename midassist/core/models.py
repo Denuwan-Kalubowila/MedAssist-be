@@ -47,7 +47,6 @@ class Image(models.Model):
 class Pdf(models.Model):
     pdf_file = models.FileField(upload_to='post_pdfs')  # Change from ImageField to FileField
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
     def __str__(self):
         return str(self.pdf_file)
 
@@ -68,4 +67,4 @@ class Doctor(models.Model):
 class Message(models.Model):
     message = models.TextField()
     def __str__(self):
-        return self.msg
+        return self.message

@@ -9,10 +9,6 @@ urlpatterns = [
     path('log-out/', views.logout_view),
     path('upload_image/', views.post_image),
     path('doctors/', views.doctors_view, name="doctors"),
-
-    path('upload_image/', views.post_image),
-    path('upload_pdf/', views.post_pdf),
-    path('doctors/', views.doctors_view, name="doctors"),
     path('users/', views.user_details, name="users"),
     path('chat/', views.chat, name="chat"),
 
