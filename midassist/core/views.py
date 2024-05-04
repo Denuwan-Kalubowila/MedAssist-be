@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .models import Image, User, Doctor
 from .serializers import ImageSerializer, DoctorSerializer, PdfSerializer
 from .serializers import UserSerializer
-from .models import User
+from .chat import get_response_medassist
 
 user_id = 0
 
@@ -124,3 +124,14 @@ def doctors_view(request):
     doctors = Doctor.objects.all()  # Retrieve all doctors from the database
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+def chat(request):
+    user_msg_serializer = MessageSerializer(data=request.data)
+    if user_msg_serializer.is_valid():
+        user_msg = user_msg_serializer.data['message']  # Assuming 'message' field in serializer
+        response = get_response_medassist(user_msg)
+        return Response(response)
+    else:
+        print('Error:', user_msg_serializer.errors)
+        return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
