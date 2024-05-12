@@ -1,8 +1,9 @@
-from rest_framework import serializers, viewsets
+from rest_framework import serializers
 from .models import User, Doctor
 from .models import Message
 from .models import Pdf
 from .models import Image
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,7 +27,8 @@ class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
-        
+
+
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
