@@ -104,9 +104,10 @@ def post_image(request):
 @api_view(['POST'])
 def post_pdf(request):
     if request.method == 'POST':
+        print(request)
         pdf_file = request.data.get('pdf_file')
-        user = request.user  # Assuming you are using authentication
-        post_data = {'pdf_file': pdf_file, 'user': user.id}
+        user = request.data.get('user')
+        post_data = {'pdf_file': pdf_file, 'user': user}
         post_serializer = PdfSerializer(data=post_data)
 
         if post_serializer.is_valid():
