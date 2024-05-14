@@ -6,15 +6,14 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from .extract_text import extract_text_from_pdf
 from .models import Image, User, Doctor
-from .serializers import ImageSerializer, PdfSerializer, MessageSerializer
+from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
 from .serializers import UserSerializer, DoctorSerializer
+from .chat import get_response_medassist
+from .extract_text import extract_text_from_pdf
 from .gemini_api import model
 from requests.exceptions import ConnectionError
 
-# from .chat import get_response_medassist
 
 user_id = 0
 
@@ -110,7 +109,7 @@ def post_image(request):
 def post_pdf(request):
     if request.method == 'POST':
         pdf_file = request.data.get('pdf_file')
-        user = request.data.get('user')
+        user = 1
 
         pdf_text = extract_text_from_pdf(pdf_file)
 
@@ -151,14 +150,13 @@ def doctors_view(request):
     return Response(serializer.data)
 
 
-"""@api_view(['POST'])
+@api_view(['POST'])
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
-        user_msg = user_msg_serializer.data['message']  # Assuming 'message' field in serializer
+        user_msg = user_msg_serializer.data['message']
         response = get_response_medassist(user_msg)
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-"""

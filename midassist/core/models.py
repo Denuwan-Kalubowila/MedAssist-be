@@ -63,7 +63,7 @@ class Doctor(models.Model):
 
     def __str__(self):
         return self.email
-    
+ 
 class Message(models.Model):
     message = models.TextField()
     def __str__(self):
