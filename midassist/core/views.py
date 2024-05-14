@@ -6,10 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from .extract_text import extract_text_from_pdf
 from .models import Image, User, Doctor
-from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
+from .serializers import ImageSerializer, PdfSerializer, MessageSerializer
 from .serializers import UserSerializer, DoctorSerializer
-from .chat import get_response_medassist
+from .gemini_api import model
+from requests.exceptions import ConnectionError
+
+# from .chat import get_response_medassist
 
 user_id = 0
 
@@ -104,18 +109,37 @@ def post_image(request):
 @api_view(['POST'])
 def post_pdf(request):
     if request.method == 'POST':
-        print(request)
         pdf_file = request.data.get('pdf_file')
         user = request.data.get('user')
-        post_data = {'pdf_file': pdf_file, 'user': user}
-        post_serializer = PdfSerializer(data=post_data)
 
-        if post_serializer.is_valid():
-            post_serializer.save()
-            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            print('error', post_serializer.errors)
-            return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        pdf_text = extract_text_from_pdf(pdf_file)
+
+        try:
+            # Use the generative AI model to generate a response
+            convo = model.start_chat(history=[])
+            message = pdf_text  # Pass the extracted text as input
+            convo.send_message(message)
+            response = convo.last.text
+            print(response)
+
+            post_data = {'pdf_file': pdf_file, 'user': user}
+            post_serializer = PdfSerializer(data=post_data)
+
+            if post_serializer.is_valid():
+                post_serializer.save()
+                return Response({"pdf_data": post_serializer.data, "response": response}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except ConnectionError:
+            # Handle internet connection error
+            return Response({"message": "Internet connection error. Please try again later."},
+                            status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        except Exception as e:
+            # Handle other errors
+            print("Error:", e)
+            return Response({"message": "An error occurred while processing your request."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return Response({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -126,7 +150,8 @@ def doctors_view(request):
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
-@api_view(['POST'])
+
+"""@api_view(['POST'])
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
@@ -136,3 +161,4 @@ def chat(request):
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+"""
