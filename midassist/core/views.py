@@ -108,15 +108,13 @@ def post_image(request):
 @api_view(['POST'])
 def post_pdf(request):
     if request.method == 'POST':
-        pdf_file = request.data.get('pdf_file')
-        user = 1
-
+        pdf_file = request.FILES.get('pdf_file')
+        user = "1"
         pdf_text = extract_text_from_pdf(pdf_file)
 
         try:
-            # Use the generative AI model to generate a response
             convo = model.start_chat(history=[])
-            message = pdf_text  # Pass the extracted text as input
+            message = pdf_text
             convo.send_message(message)
             response = convo.last.text
             print(response)
@@ -131,11 +129,9 @@ def post_pdf(request):
                 return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except ConnectionError:
-            # Handle internet connection error
             return Response({"message": "Internet connection error. Please try again later."},
                             status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except Exception as e:
-            # Handle other errors
             print("Error:", e)
             return Response({"message": "An error occurred while processing your request."},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
