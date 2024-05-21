@@ -47,7 +47,7 @@ jobs:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           echo "Encoded credentials: $GOOGLE_CREDENTIALS"
-          echo $HOME
+          echo "$HOME"
           echo $GOOGLE_CREDENTIALS | base64 --decode > $HOME/gcp_credentials.json
           echo "Decoded credentials written to gcp_credentials.json:"
           cat $HOME/gcp_credentials.json
