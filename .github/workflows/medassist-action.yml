@@ -9,16 +9,12 @@ jobs:
         python-version: ["3.12"]
     steps:
       - name: Install gcloud CLI
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.12'
-          name: Install Google Cloud SDK
-          run: |
-            sudo apt-get install -y wget
-            wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
-            tar -xvf google-cloud-sdk.tar.gz
-            ./google-cloud-sdk/install.sh
-            source ~/.bashrc  
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https ca-certificates gnupg
+          echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
@@ -44,11 +40,17 @@ jobs:
           
       - name: Setup Google Cloud Credentials
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
-          echo " decoded credentials:"
-          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-          gcloud auth activate-service-account --key-file=- <<< ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          echo "$GOOGLE_CREDENTIALS" | base64 --decode > $HOME/gcp_credentials.json
+          echo "Decoded credentials written to gcp_credentials.json:"
+          cat $HOME/gcp_credentials.json
+
+      - name: Configure Google Cloud SDK
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp_credentials.json
+        run: |
+          gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
           gcloud config set project medassist-419918
             
       - name: Apply Migrations
