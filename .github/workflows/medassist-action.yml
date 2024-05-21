@@ -33,9 +33,9 @@ jobs:
           
       - name: Setup Google Cloud Credentials
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
-          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} | base64 --decode >$HOME/gcp_credentials.json
+          echo ${{ secrets.GOOGLE_CREDENTIALS }} | base64 --decode > $HOME/gcp_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp_credentials.json
             
       - name: Apply Migrations
