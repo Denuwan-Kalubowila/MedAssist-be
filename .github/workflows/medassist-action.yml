@@ -46,14 +46,12 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
-          echo "Contents of gcp_credentials.json:"
+          echo "Encoded credentials: $GOOGLE_CREDENTIALS"
+          echo $HOME
+          echo $GOOGLE_CREDENTIALS | base64 --decode > $HOME/gcp_credentials.json
+          echo "Decoded credentials written to gcp_credentials.json:"
           cat $HOME/gcp_credentials.json
-          echo "Decoded contents:"
-          cat $HOME/gcp_credentials.json | base64 --decode
-          echo "Activating service account..."
-          gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
-          echo "Setting project..."
-          gcloud config set project medassist-419918
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp_credentials.json
             
       - name: Apply Migrations
         run: |
