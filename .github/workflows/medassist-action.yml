@@ -31,6 +31,13 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           
+      - name: Setup Google Cloud Credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        run: |
+          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} > gcp_credentials.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/gcp_credentials.json
+            
       - name: Apply Migrations
         run: |
           cd midassist
