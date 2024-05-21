@@ -42,8 +42,7 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
-          echo "$GOOGLE_CREDENTIALS" | base64 --decode > $HOME/gcp_credentials.json
-          echo "Decoded credentials written to gcp_credentials.json:"
+          echo "$GOOGLE_CREDENTIALS" > $HOME/gcp_credentials.json
           cat $HOME/gcp_credentials.json
 
       - name: Configure Google Cloud SDK
