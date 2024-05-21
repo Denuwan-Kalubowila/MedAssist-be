@@ -50,6 +50,8 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp_credentials.json
       - name: Configure Google Cloud SDK
         run: |
+          echo "Contents of gcp_credentials.json:"
+          cat $HOME/gcp_credentials.json
           gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
           gcloud config set project medassist-419918
             
