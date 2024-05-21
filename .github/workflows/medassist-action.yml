@@ -8,6 +8,17 @@ jobs:
       matrix:
         python-version: ["3.12"]
     steps:
+      - name: Install gcloud CLI
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+          name: Install Google Cloud SDK
+          run: |
+            sudo apt-get install -y wget
+            wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+            tar -xvf google-cloud-sdk.tar.gz
+            ./google-cloud-sdk/install.sh
+            source ~/.bashrc  
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
