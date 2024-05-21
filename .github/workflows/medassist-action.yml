@@ -46,12 +46,12 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
-          echo "Encoded credentials: $GOOGLE_CREDENTIALS"
-          echo "$HOME"
-          echo $GOOGLE_CREDENTIALS | base64 --decode >> $HOME/gcp_credentials.json
-          echo "Decoded credentials written to gcp_credentials.json:"
-          cat $HOME/gcp_credentials.json
+          echo ${{ secrets.GOOGLE_CREDENTIALS }} | base64 --decode > $HOME/gcp_credentials.json
           export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp_credentials.json
+      - name: Configure Google Cloud SDK
+        run: |
+          gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
+          gcloud config set project medassist-419918
             
       - name: Apply Migrations
         run: |
