@@ -104,7 +104,6 @@ def post_image(request):
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def post_pdf(request):
     if request.method == 'POST':
@@ -145,13 +144,17 @@ def doctors_view(request):
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
-
 @api_view(['POST'])
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
-        user_msg = user_msg_serializer.data['message']
+        user_msg = user_msg_serializer.validated_data['message']
         response = get_response_medassist(user_msg)
+        message_instance = Message.objects.create(
+            message=user_msg,
+            bot_response=response,
+            user=user_msg_serializer.validated_data['user']
+        )
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
