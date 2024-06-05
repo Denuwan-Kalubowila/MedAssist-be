@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data_vol:/data/db
+
+  app:
+    build: .
+    image: medassist
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    env_file: .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=True
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_ENGINE=${DATABASE_ENGINE}
+      - PROJECT=${PROJECT}
+      - LOCATION=${LOCATION}
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongo
+volumes:
+  mongo-data_vol:

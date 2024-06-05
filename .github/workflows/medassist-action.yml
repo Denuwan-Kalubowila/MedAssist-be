@@ -8,21 +8,50 @@ jobs:
       matrix:
         python-version: ["3.9","3.12"]
     steps:
+      - name: Install gcloud CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https ca-certificates gnupg
+          echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install mongosh
+        run: |
+          sudo apt-get install gnupg
+          wget -qO- https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-7.0.asc
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-mongosh
+          mongosh --version
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Check installed packages
-        run: pip list
+
+      - name: Setup Google Cloud Credentials
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > $HOME/gcp_credentials.json
+          cat $HOME/gcp_credentials.json
+
+      - name: Configure Google Cloud SDK
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp_credentials.json
+        run: |
+          gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
+          gcloud config set project medassist-419918
+
       - name: Apply Migrations
         run: |
           cd midassist

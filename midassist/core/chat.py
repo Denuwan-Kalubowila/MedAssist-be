@@ -1,5 +1,9 @@
+"""
+  Description:
+    This module repesent the chat feature of the MedAssit .
+"""
 import os
-import vertexai 
+import vertexai
 from vertexai.language_models import ChatModel
 from vertexai import generative_models
 from dotenv import load_dotenv
@@ -22,7 +26,7 @@ safety_settings={
 }
 chat = chat_model.start_chat(
   context="""Think you are the family doctor. You should able to advice your patients for healthy life.
-    You must analyze the patient's requirements well and provide the instructions to do . 
+    You must analyze the patient's requirements well and provide the instructions to do .
      use simple English for understanding instructions to patient."""
 )
 
@@ -38,13 +42,11 @@ def get_response_medassist(user_message):
     """
 
     try:
-        # Ensure user_message is a string
         if not isinstance(user_message, str):
             raise ValueError("user_message must be a string")
 
         response = chat.send_message(user_message,**parameters)
         return response.text
     except Exception as e:
-        print(f"Error getting response: {e} {user_message}")
+        print(f"Error getting response: {e}")
         return "An error occurred. Please try again later."
-
