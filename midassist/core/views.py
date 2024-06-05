@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Image, User, Doctor
+from .models import Image, User, Doctor,Message
 from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
 from .serializers import UserSerializer, DoctorSerializer
 from .chat import get_response_medassist
@@ -150,8 +150,13 @@ def doctors_view(request):
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
-        user_msg = user_msg_serializer.data['message']
+        user_msg = user_msg_serializer.validated_data['message']
         response = get_response_medassist(user_msg)
+        message_instance = Message.objects.create(
+            message=user_msg,
+            bot_response=response,
+            user=user_msg_serializer.validated_data['user']
+        )
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
