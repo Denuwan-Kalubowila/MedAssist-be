@@ -11,7 +11,5 @@ urlpatterns = [
     path('doctors/', views.doctors_view, name="doctors"),
     path('users/', views.user_details, name="users"),
     path('upload_pdf/', views.post_pdf),
-    # path('chat/', views.chat, name="chat"),
-    # path('text_genarator/', views.generate_pdf_text)
-
+    path('chat/', views.chat, name="chat"),
 ]
