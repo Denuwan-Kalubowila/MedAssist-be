@@ -65,6 +65,5 @@ class Message(models.Model):
     message = models.TextField()
     bot_response = models.TextField(default="Some String")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
     def __str__(self):
         return self.message
