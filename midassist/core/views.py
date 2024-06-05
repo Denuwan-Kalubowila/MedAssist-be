@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Post, User, Doctor
+from .models import Post, User, Doctor,Message
 from .serializers import PostSerializer, DoctorSerializer,MessageSerializer
 from .serializers import UserSerializer
 from .chat import get_response_medassist
@@ -83,11 +83,11 @@ def user_details(request):
         return Response({'error': 'User session not found'}, status=404)
 
 
-# @api_view(['GET'])
-# def get_image(request):
-#     posts = Post.objects.all()
-#     serializer = PostSerializer(posts, many=True)
-#     return Response(serializer.data)
+@api_view(['GET'])
+def get_image(request):
+    posts = Post.objects.all()
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -101,18 +101,23 @@ def post_image(request):
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @api_view(['GET'])
-# def doctors_view(request):
-#     doctors = Doctor.objects.all()  # Retrieve all doctors from the database
-#     serializer = DoctorSerializer(doctors, many=True)
-#     return Response(serializer.data)
+@api_view(['GET'])
+def doctors_view(request):
+    doctors = Doctor.objects.all()  # Retrieve all doctors from the database
+    serializer = DoctorSerializer(doctors, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
-        user_msg = user_msg_serializer.data['message']  # Assuming 'message' field in serializer
+        user_msg = user_msg_serializer.validated_data['message']
         response = get_response_medassist(user_msg)
+        message_instance = Message.objects.create(
+            message=user_msg,
+            bot_response=response,
+            user=user_msg_serializer.validated_data['user']
+        )
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
