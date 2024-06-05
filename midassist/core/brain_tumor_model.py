@@ -45,29 +45,5 @@ output_data = interpreter.get_tensor(output_details[0]['index'])
 # Print the output
 print("Output:", output_data)
 
-# # input details
-# print(input_details)
-# # output details
-# print(output_details)
-
-# for file in pathlib.Path('../media/model_images').iterdir():
-#     # read and resize the image
-#     img = cv2.imread(r"{}".format(file.resolve()))
-#     new_img = cv2.resize(img, (150, 150))
-#
-#     # Convert the image to float32 and normalize to [0, 1]
-#     new_img = new_img.astype(np.float32) / 255.0
-#
-#     # Add a batch dimension since the model expects input shape: [1, 150, 150, 3]
-#     new_img = np.expand_dims(new_img, axis=0)
-#
-#     # input_details[0]['index'] = the index which accepts the input
-#     interpreter.set_tensor(input_details[0]['index'], new_img)
-#
-#     # run the inference
-#     interpreter.invoke()
-#
-#     # output_details[0]['index'] = the index which provides the output
-#     output_data = interpreter.get_tensor(output_details[0]['index'])
-#
-#     print("For file {}, the output is {}".format(file.stem, output_data))
+predicted_class = np.argmax(output_data)
+print("Predicted class:", predicted_class)
