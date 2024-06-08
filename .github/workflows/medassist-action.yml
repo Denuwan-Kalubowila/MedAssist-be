@@ -54,6 +54,7 @@ jobs:
 
       - name: Apply Migrations
         run: |
+          echo "GOOGLE_CREDENTIALS: $GOOGLE_CREDENTIALS"
           gcloud config get-value project
           cd midassist
           python manage.py makemigrations
