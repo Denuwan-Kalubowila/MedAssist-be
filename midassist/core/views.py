@@ -6,18 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from .extract_text import extract_text_from_pdf
-from .models import Image, User, Doctor
-from .serializers import ImageSerializer, PdfSerializer, MessageSerializer
+from .models import Image, User, Doctor,Message
+from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
 from .serializers import UserSerializer, DoctorSerializer
+from .chat import get_response_medassist
+from .extract_text import extract_text_from_pdf
 from .gemini_api import model
 from requests.exceptions import ConnectionError
 
-# from .chat import get_response_medassist
-
 user_id = 0
-
 
 @api_view(['POST'])
 @csrf_exempt
@@ -105,19 +102,16 @@ def post_image(request):
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def post_pdf(request):
     if request.method == 'POST':
-        pdf_file = request.data.get('pdf_file')
-        user = request.data.get('user')
-
+        pdf_file = request.FILES.get('pdf_file')
+        user = "1"
         pdf_text = extract_text_from_pdf(pdf_file)
 
         try:
-            # Use the generative AI model to generate a response
             convo = model.start_chat(history=[])
-            message = pdf_text  # Pass the extracted text as input
+            message = pdf_text
             convo.send_message(message)
             response = convo.last.text
             print(response)
@@ -132,11 +126,9 @@ def post_pdf(request):
                 return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except ConnectionError:
-            # Handle internet connection error
             return Response({"message": "Internet connection error. Please try again later."},
                             status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except Exception as e:
-            # Handle other errors
             print("Error:", e)
             return Response({"message": "An error occurred while processing your request."},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -150,15 +142,18 @@ def doctors_view(request):
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
-
-"""@api_view(['POST'])
+@api_view(['POST'])
 def chat(request):
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
-        user_msg = user_msg_serializer.data['message']  # Assuming 'message' field in serializer
+        user_msg = user_msg_serializer.validated_data['message']
         response = get_response_medassist(user_msg)
+        message_instance = Message.objects.create(
+            message=user_msg,
+            bot_response=response,
+            user=user_msg_serializer.validated_data['user']
+        )
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-"""
