@@ -49,6 +49,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp_credentials.json
         run: |
+          gcloud config get-value project
           gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
           gcloud config set project medassist-419918
 
