@@ -8,6 +8,7 @@ from vertexai.language_models import ChatModel
 from vertexai import generative_models
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 vertexai.init(project=os.getenv('PROJECT'), location=os.getenv('LOCATION'))

@@ -14,9 +14,7 @@ from .extract_text import extract_text_from_pdf
 from .gemini_api import model
 from requests.exceptions import ConnectionError
 
-
 user_id = 0
-
 
 @api_view(['POST'])
 @csrf_exempt
