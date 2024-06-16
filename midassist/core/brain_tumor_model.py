@@ -1,16 +1,26 @@
+import os
+import django
 import numpy as np
 import tensorflow as tf
 import cv2
 import pathlib
 
-# Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="../models/Brain_Tumor1.tflite")
+from django.conf import settings
 
-# Get input and output tensors.
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+# Ensure Django settings are loaded
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'midassist.settings')
+django.setup()
 
-interpreter.allocate_tensors()
+
+def load_interpreter():
+    model_path = settings.MODEL_PATH
+    if not os.path.exists(model_path):
+        raise ValueError(f"Could not open '{model_path}'")
+
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
+
+    return interpreter
 
 
 # Preprocess the input image
@@ -30,20 +40,43 @@ def preprocess_image(image_path):
     return img
 
 
-image_path = "../media/model_images/IMG-20240605-WA0061.jpg"  # Replace with the path to your image
-input_image = preprocess_image(image_path)
+def predict(image_path):
+    interpreter = load_interpreter()
 
-# Set the input tensor
-interpreter.set_tensor(input_details[0]['index'], input_image)
+    # Get input and output tensors
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
 
-# Invoke the interpreter
-interpreter.invoke()
+    input_image = preprocess_image(image_path)
 
-# Get the output tensor
-output_data = interpreter.get_tensor(output_details[0]['index'])
+    # Set the input tensor
+    interpreter.set_tensor(input_details[0]['index'], input_image)
 
-# Print the output
-print("Output:", output_data)
+    # Invoke the interpreter
+    interpreter.invoke()
 
-predicted_class = np.argmax(output_data)
-print("Predicted class:", predicted_class)
+    # Get the output tensor
+    output_data = interpreter.get_tensor(output_details[0]['index'])
+
+    # Determine the predicted class
+    predicted_class = np.argmax(output_data)
+
+    return predicted_class
+
+# image_path = "../media/model_images/IMG-20240605-WA0061.jpg"  # Replace with the path to your image
+# input_image = preprocess_image(image_path)
+#
+# # Set the input tensor
+# interpreter.set_tensor(input_details[0]['index'], input_image)
+#
+# # Invoke the interpreter
+# interpreter.invoke()
+#
+# # Get the output tensor
+# output_data = interpreter.get_tensor(output_details[0]['index'])
+#
+# # Print the output
+# print("Output:", output_data)
+#
+# predicted_class = np.argmax(output_data)
+# print("Predicted class:", predicted_class)
