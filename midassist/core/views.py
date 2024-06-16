@@ -104,14 +104,7 @@ def post_image(request):
     if posts_serializer.is_valid():
         posts_serializer.save()
 
-        print(posts_serializer)
-        # test
-        # Get the image path
-        image_path = posts_serializer.data['image']  # Adjust this if necessary
-
-over
-
-        # return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
     else:
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
