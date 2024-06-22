@@ -38,20 +38,19 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Setup Google Cloud Credentials
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        run: |
-          echo "$GOOGLE_CREDENTIALS" > $HOME/gcp_credentials.json
-          cat $HOME/gcp_credentials.json
-
-      - name: Configure Google Cloud SDK
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcp_credentials.json
-        run: |
-          gcloud auth activate-service-account --key-file=$HOME/gcp_credentials.json
-          gcloud config set project medassist-419918
-
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0.3.1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: 'https://iam.googleapis.com/projects/139066790453/locations/global/workloadIdentityPools/medassist-github/providers/medassist-github'
+          service_account: 'medchat@medassist-419918.iam.gserviceaccount.com'
+      - id: 'gcloud'
+        name: 'gcloud'
+        run: |-
+          gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+          gcloud services list
+        
       - name: Apply Migrations
         run: |
           echo "GOOGLE_CREDENTIALS: $GOOGLE_CREDENTIALS"
