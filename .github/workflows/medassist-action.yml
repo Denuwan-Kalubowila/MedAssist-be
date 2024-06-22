@@ -58,7 +58,7 @@ jobs:
         name: 'gcloud'
         run: |-
           gcloud auth activate-service-account --key-file="${{ steps.auth.outputs.credentials_file_path }}"
-          gcloud config set project ${{ secrets.GOOGLE_PROJECT_ID }}
+          gcloud config set project medassist-419918
           gcloud services list
         
       - name: Apply Migrations
