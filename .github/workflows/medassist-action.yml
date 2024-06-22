@@ -48,15 +48,17 @@ jobs:
         name: 'Authenticate to GCP'
         uses: 'google-github-actions/auth@v2'
         with:
+          project_id: "medassist-419918"
           create_credentials_file: 'true'
           workload_identity_provider: '/projects/139066790453/locations/global/workloadIdentityPools/medassist-github-action/providers/github'
           service_account: 'medchat@medassist-419918.iam.gserviceaccount.com'
+          
       - id: 'gcloud'
         name: 'gcloud'
         run: |-
           gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
-          gcloud auth login
-          gcloud service list
+          gcloud config set medassist-419918
+          gcloud services list
         
       - name: Apply Migrations
         run: |
