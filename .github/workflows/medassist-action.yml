@@ -53,6 +53,11 @@ jobs:
           workload_identity_provider: 'projects/139066790453/locations/global/workloadIdentityPools/medassist-github-vertex/providers/medassist-repo'
           service_account: 'medassist-chat@medassist-419918.iam.gserviceaccount.com'
           token_format: "access_token"
+
+      - name: Debug Credentials File
+        run: |
+          echo "Contents of the credentials file:"
+          cat "${{ steps.auth.outputs.credentials_file_path }}"
           
       - id: 'gcloud'
         name: 'gcloud'
