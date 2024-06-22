@@ -50,8 +50,8 @@ jobs:
         with:
           project_id: "medassist-419918"
           create_credentials_file: 'true'
-          workload_identity_provider: 'projects/139066790453/locations/global/workloadIdentityPools/medassist-github-action/providers/github'
-          service_account: 'medchat@medassist-419918.iam.gserviceaccount.com'
+          workload_identity_provider: 'projects/139066790453/locations/global/workloadIdentityPools/medassist-github-vertex/providers/medassist-repo'
+          service_account: 'medassist-chat@medassist-419918.iam.gserviceaccount.com'
           
       - id: 'gcloud'
         name: 'gcloud'
