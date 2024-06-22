@@ -49,7 +49,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           create_credentials_file: 'true'
-          workload_identity_provider: 'https://iam.googleapis.com/projects/139066790453/locations/global/workloadIdentityPools/medassist-github-action/providers/github'
+          workload_identity_provider: '/projects/139066790453/locations/global/workloadIdentityPools/medassist-github-action/providers/github'
           service_account: 'medchat@medassist-419918.iam.gserviceaccount.com'
       - id: 'gcloud'
         name: 'gcloud'
