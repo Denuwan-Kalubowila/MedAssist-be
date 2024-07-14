@@ -153,6 +153,7 @@ def chat(request):
             bot_response=response,
             user=user_msg_serializer.validated_data['user']
         )
+        print(message_instance)
         return Response(response)
     else:
         print('Error:', user_msg_serializer.errors)
