@@ -7,6 +7,9 @@ import pathlib
 
 from django.conf import settings
 
+import sys
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
 # Ensure Django settings are loaded
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'midassist.settings')
 django.setup()
@@ -42,30 +45,19 @@ def preprocess_image(image_path):
 
 def predict(image_path):
     interpreter = load_interpreter()
-
-    # Get input and output tensors
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
-
     input_image = preprocess_image(image_path)
-
-    # Set the input tensor
     interpreter.set_tensor(input_details[0]['index'], input_image)
-
-    # Invoke the interpreter
     interpreter.invoke()
-
-    # Get the output tensor
     output_data = interpreter.get_tensor(output_details[0]['index'])
-
-    # Determine the predicted class
     predicted_class = np.argmax(output_data)
-
     return predicted_class
 
-# image_path = "../media/model_images/IMG-20240605-WA0061.jpg"  # Replace with the path to your image
+# image_path = "../media/post_images/41598_2023_41576_Fig1_HTML.jpg"  # Replace with the path to your image
 # input_image = preprocess_image(image_path)
-#
+# predict(image_path)
+
 # # Set the input tensor
 # interpreter.set_tensor(input_details[0]['index'], input_image)
 #

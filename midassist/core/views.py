@@ -103,8 +103,13 @@ def post_image(request):
     posts_serializer = ImageSerializer(data=request.data)
     if posts_serializer.is_valid():
         posts_serializer.save()
-
-        return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        image_path = posts_serializer.instance.image.path  # Get the path of the saved image
+        predicted_class = predict(image_path)
+        response_data = {
+            'image': posts_serializer.data,
+            'predicted_class': predicted_class
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
     else:
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
