@@ -34,4 +34,4 @@ services:
       - mongo
 volumes:
   mongo-data_vol:
-  # This is the volume that will be used to store the data of the MongoDB container.
+# volumes:
