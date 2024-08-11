@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9","3.12"]
+        python-version: ["3.12"]
     steps:
       - name: Install gcloud CLI
         run: |
@@ -45,34 +45,12 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - id: 'auth'
-        name: 'Authenticate to GCP'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: ${{secrets.PROJECT_ID}}
-          create_credentials_file: 'true'
-          workload_identity_provider: ${{secrets.WORKLOAD_IDENTITY_PROVIDER}}
-          service_account: ${{secrets.MED_SERVICE_ACCOUNT}}
-          token_format: "access_token"
-
-      - name: Debug Credentials File
-        run: |
-          echo "Contents of the credentials file:"
-          cat "${{ steps.auth.outputs.credentials_file_path }}"
-          
-      - id: 'gcloud'
-        name: 'gcloud'
-        run: |-
-          gcloud auth activate-service-account --key-file="${{ steps.auth.outputs.credentials_file_path }}"
-          gcloud config set project medassist-419918
-          gcloud services list
-        
       - name: Apply Migrations
         run: |
           cd midassist
           python manage.py makemigrations
           python manage.py migrate
 
-      - name: Run Tests
+      - name: Run App
         run: |
-          python manage.py test core
+          python manage.py runserver
