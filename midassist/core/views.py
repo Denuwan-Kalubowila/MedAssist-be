@@ -6,13 +6,13 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.request import Request
 from .models import Image, User, Doctor,Message
 from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
 from .serializers import UserSerializer, DoctorSerializer
-from .chat import get_response_medassist
 from .extract_text import extract_text_from_pdf
-from .gemini_api import model
 from requests.exceptions import ConnectionError
+import requests
 
 user_id = 0
 
@@ -87,6 +87,9 @@ def user_details(request):
 
 @api_view(['GET'])
 def get_image(request):
+    """
+    This method is used to retrieve all images from the database
+    """
     posts = Image.objects.all()
     serializer = ImageSerializer(posts, many=True)
     return Response(serializer.data)
@@ -94,6 +97,9 @@ def get_image(request):
 
 @api_view(['POST'])
 def post_image(request):
+    """
+    This method is used to post an image file
+    """
     posts_serializer = ImageSerializer(data=request.data)
     if posts_serializer.is_valid():
         posts_serializer.save()
@@ -104,6 +110,9 @@ def post_image(request):
 
 @api_view(['POST'])
 def post_pdf(request):
+    """
+    This method is used to post a pdf file and get a response GEMINI model
+    """
     if request.method == 'POST':
         pdf_file = request.FILES.get('pdf_file')
         user = "1"
@@ -138,23 +147,46 @@ def post_pdf(request):
 
 @api_view(['GET'])
 def doctors_view(request):
+    """
+    This method is used to retrieve all doctors from the database
+    """
     doctors = Doctor.objects.all()  # Retrieve all doctors from the database
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
 def chat(request):
+    """
+    This method is used to chat with the bot
+    params:request(user message)
+    return: response(bot message)
+    """
     user_msg_serializer = MessageSerializer(data=request.data)
     if user_msg_serializer.is_valid():
         user_msg = user_msg_serializer.validated_data['message']
-        response = get_response_medassist(user_msg)
-        message_instance = Message.objects.create(
-            message=user_msg,
-            bot_response=response,
-            user=user_msg_serializer.validated_data['user']
-        )
-        print(message_instance)
-        return Response(response)
+        print(user_msg)
+        payload = {
+            "question": user_msg
+        }
+        try:
+            response = requests.post("https://chat-image-mbsultlcoa-uc.a.run.app/questions", json=payload)    
+            if response.status_code == 200:
+                response_data = response.json()
+                if 'answer' in response_data:
+                    message_instance = Message.objects.create(
+                        message=user_msg,
+                        bot_response=response_data['answer'],
+                        user=user_msg_serializer.validated_data['user']
+                    )
+                    return Response({"answer": response_data['answer']}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": "The response did not contain an answer."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response({"error": "Failed to get a valid response from the service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except requests.exceptions.RequestException as e:
+            print('Error:', e)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+       
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
