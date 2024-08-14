@@ -1,6 +1,7 @@
 """
 This is the view of core module
 """
+import os
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -13,6 +14,9 @@ from .serializers import UserSerializer, DoctorSerializer
 from .extract_text import extract_text_from_pdf
 from requests.exceptions import ConnectionError
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 user_id = 0
 
@@ -169,7 +173,7 @@ def chat(request):
             "question": user_msg
         }
         try:
-            response = requests.post("https://chat-image-mbsultlcoa-uc.a.run.app/questions", json=payload)    
+            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)    
             if response.status_code == 200:
                 response_data = response.json()
                 if 'answer' in response_data:
