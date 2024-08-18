@@ -151,16 +151,37 @@ def post_pdf(request):
     else:
         return Response({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
+@api_view(['POST'])
+def post_doctor(request):
+    """
+    This method is used to post a doctor
+    """
+    doctor_serializer = DoctorSerializer(data=request.data)
+    if doctor_serializer.is_valid():
+        doctor_serializer.save()
+        return Response(doctor_serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        print('error', doctor_serializer.errors)
+        return Response(doctor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def doctors_view(request):
     """
     This method is used to retrieve all doctors from the database
     """
-    doctors = Doctor.objects.all()  # Retrieve all doctors from the database
+    doctors = Doctor.objects.all()
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def get_doctotrs_by_review(request):
+    """
+    This method is used to retrieve all doctors from the database
+    """
+    doctors = Doctor.objects.all().order_by('reviews')[:10]
+    serializer = DoctorSerializer(doctors, many=True)
+    return  Response(serializer.data)
+
 
 @api_view(['POST'])
 def chat(request):
