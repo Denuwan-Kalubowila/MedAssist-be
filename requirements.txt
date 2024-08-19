@@ -8,9 +8,10 @@ pillow
 pymongo==3.12.1
 pytz
 python-dotenv~=1.0.0
-vertexai
+vertexai~=1.49.0
 
 pypdf2~=3.0.1
 requests~=2.31.0
-numpy~=1.26.1
+numpy~=1.24.3
 tensorflow~=2.16.1
+opencv-python~=4.10.0.82

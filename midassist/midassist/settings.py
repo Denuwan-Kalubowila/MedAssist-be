@@ -103,3 +103,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # URL used to access the media
 MEDIA_URL = '/media/'
+
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Brain_Tumor1.tflite')
