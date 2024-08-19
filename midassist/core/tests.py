@@ -4,7 +4,7 @@ Test for core module
 # from django.test import TestCase
 # from .models import User
 import pytest
-from .chat import get_response_medassist
+from .views import chat
 
 
 # class UserModelTestCase(TestCase):
@@ -46,10 +46,20 @@ from .chat import get_response_medassist
 #             User.objects.create_user(email='', first_name='John', last_name='Doe')
 
 
-def test_chat_response_status_code():
+def test_chat_response_status_code_bad_request():
     """Test Chat model"""
-    response, status_code = get_response_medassist("Hello")
-    assert status_code == 200  
+    response, status_code = chat({"Hello"})
+    assert status_code == 400
+
+def test_chat_response_status_code_success():
+    """Test Chat model"""
+    response, status_code = chat({"Hello",1})
+    assert status_code == 200
+
+def test_chat_response_status_server_error():
+    """Test Chat model"""
+    response, status_code = chat()
+    assert status_code == 400  
 
 if __name__ == "__main__":
     pytest.main()

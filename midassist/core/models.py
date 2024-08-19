@@ -56,6 +56,7 @@ class Doctor(models.Model):
     about = models.CharField(max_length=45)
     time = models.CharField(max_length=20)
     experience = models.CharField(max_length=5)
+    reviews = models.IntegerField()
 
     def __str__(self):
         return self.email
