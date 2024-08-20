@@ -2,11 +2,16 @@
 This is the view of core module
 """
 import os
+
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from .brain_tumor_model import predict
+from .extract_text import extract_text_from_pdf
+from .gemini_api import model
 from rest_framework.request import Request
 from .models import Image, User, Doctor,Message
 from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
@@ -19,7 +24,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# from .chat import get_response_medassist
+
 user_id = 0
+
 
 @api_view(['POST'])
 @csrf_exempt
@@ -108,10 +116,17 @@ def post_image(request):
     posts_serializer = ImageSerializer(data=request.data)
     if posts_serializer.is_valid():
         posts_serializer.save()
-        return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        image_path = posts_serializer.instance.image.path  # Get the path of the saved image
+        predicted_class = predict(image_path)
+        response_data = {
+            'image': posts_serializer.data,
+            'predicted_class': predicted_class
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
     else:
         print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def post_pdf(request):

@@ -21,9 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+  
     'rest_framework',
     'rest_framework.authtoken',
     "corsheaders",
+   
 ]
 
 MIDDLEWARE = [
@@ -35,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
+    
 ]
 
 ROOT_URLCONF = 'midassist.urls'
@@ -100,3 +103,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # URL used to access the media
 MEDIA_URL = '/media/'
+
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Brain_Tumor1.tflite')
