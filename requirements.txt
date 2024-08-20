@@ -9,8 +9,6 @@ pymongo==3.12.1
 pytz
 python-dotenv~=1.0.0
 vertexai
-
 pypdf2~=3.0.1
 requests~=2.31.0
 numpy~=1.26.1
-tensorflow~=2.16.1
