@@ -13,5 +13,5 @@ urlpatterns = [
     path('upload_image/', views.post_image),
     path('users/', views.user_details, name="users"),
     path('upload_pdf/', views.post_pdf),
-    path('medchat/', views.chat, name="chat"),
+    path("chat/', views.chat, name="chat"),
 ]
