@@ -118,9 +118,17 @@ def post_image(request):
         posts_serializer.save()
         image_path = posts_serializer.instance.image.path  # Get the path of the saved image
         predicted_class = predict(image_path)
+        if predicted_class==0:
+            p_name="glioma"
+        elif predicted_class==1:
+            p_name="meningioma"
+        elif predicted_class==2:
+            p_name="notumor"
+        elif predicted_class==3:
+            p_name="pituitary"
         response_data = {
             'image': posts_serializer.data,
-            'predicted_class': predicted_class
+            'predicted_class': p_name
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     else:
