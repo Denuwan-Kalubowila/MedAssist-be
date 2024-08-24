@@ -12,5 +12,4 @@ vertexai
 pypdf2~=3.0.1
 requests~=2.31.0
 numpy~=1.26.1
-tensorflow~=2.16.1
-opencv-python~=4.10.0.82
+djangorestframework-simplejwt

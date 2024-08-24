@@ -28,8 +28,13 @@ class DoctorSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = '__all__'
 
-
 class MessageSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ['message', 'user']
+
+# class ChatSerializer(serializers.Serializer):
+#     message = serializers.CharField(required=True)
+#     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False, allow_null=True)

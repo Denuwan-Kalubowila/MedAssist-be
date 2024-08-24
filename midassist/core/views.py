@@ -6,10 +6,10 @@ import os
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 
-from .brain_tumor_model import predict
+# from .brain_tumor_model import predict
 from .extract_text import extract_text_from_pdf
 from .gemini_api import model
 from rest_framework.request import Request
@@ -21,6 +21,10 @@ from requests.exceptions import ConnectionError
 import requests
 from .gemini_api import model
 from dotenv import load_dotenv
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 load_dotenv()
 
@@ -31,39 +35,43 @@ user_id = 0
 
 @api_view(['POST'])
 @csrf_exempt
+@permission_classes([AllowAny])
 def login_view(request):
     """
         this method use for login
     """
-    global user_id
-
     email = request.data.get('email')
     password = request.data.get('password')
 
     user = User.objects.filter(email=email).first()
-
+    #user = authenticate(email=email, password=password)
     if user:
         if user.password == password:
-            user_id = user.id
-            print(user_id)
-            return Response({'message': 'Login successful', 'user_id': user_id}, status=200)
+            refresh = RefreshToken.for_user(user.id)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user_id': user.id
+            }, status=200)
         else:
-            return Response({'error': 'Incorrect password'}, status=401)
+            return Response({'error': 'Invalid credentials'}, status=401)
+
     else:
-        return Response({'error': 'Email not found'}, status=404)
+        return Response({'error': 'Invalid credentials'}, status=401)
 
 
 @api_view(['POST'])
 @csrf_exempt
+@permission_classes([IsAuthenticated])
 def logout_view(request):
-    """
-        this method use for logout
-    """
-    global user_id
-    user_id = 0
-    print(user_id)
-    logout(request)
-    return Response({'success': 'Logged out successfully'})
+    # Blacklist the refresh token
+    try:
+        refresh_token = request.data["refresh_token"]
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({"success": "Logged out successfully"}, status=205)
+    except Exception as e:
+        return Response({"error": "Invalid token"}, status=400)
 
 
 @api_view(['POST'])
@@ -200,37 +208,38 @@ def get_doctotrs_by_review(request):
 
 @api_view(['POST'])
 def chat(request):
-    """
-    This method is used to chat with the bot
-    params:request(user message)
-    return: response(bot message)
-    """
     user_msg_serializer = MessageSerializer(data=request.data)
+    
     if user_msg_serializer.is_valid():
         user_msg = user_msg_serializer.validated_data['message']
+        user = user_msg_serializer.validated_data['user']  # This will be a User instance
         print(user_msg)
+        
         payload = {
             "question": user_msg
         }
+        
         try:
-            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)    
+            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)
+            
             if response.status_code == 200:
                 response_data = response.json()
                 if 'answer' in response_data:
                     message_instance = Message.objects.create(
                         message=user_msg,
                         bot_response=response_data['answer'],
-                        user=user_msg_serializer.validated_data['user']
+                        user=user  # Use the User instance directly
                     )
                     return Response({"answer": response_data['answer']}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "The response did not contain an answer."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response({"error": "Failed to get a valid response from the service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except requests.exceptions.RequestException as e:
             print('Error:', e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-       
+    
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
