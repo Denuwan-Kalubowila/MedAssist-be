@@ -36,7 +36,6 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['message', 'user']
 
-
-class ChatSerializer(serializers.Serializer):
-    message = serializers.CharField(required=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False, allow_null=True)
+# class ChatSerializer(serializers.Serializer):
+#     message = serializers.CharField(required=True)
+#     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False, allow_null=True)
