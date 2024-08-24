@@ -2,7 +2,7 @@
 This is the view of core module
 """
 import os
-
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -205,40 +205,41 @@ def get_doctotrs_by_review(request):
     serializer = DoctorSerializer(doctors, many=True)
     return  Response(serializer.data)
 
-
+@csrf_exempt
 @api_view(['POST'])
 def chat(request):
-    """
-    This method is used to chat with the bot
-    params:request(user message)
-    return: response(bot message)
-    """
     user_msg_serializer = MessageSerializer(data=request.data)
+    
     if user_msg_serializer.is_valid():
         user_msg = user_msg_serializer.validated_data['message']
+        user_pk = user_msg_serializer.validated_data.get('user')  # Extract user PK
         print(user_msg)
+        
         payload = {
             "question": user_msg
         }
+        
         try:
-            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)    
+            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)
+            
             if response.status_code == 200:
                 response_data = response.json()
                 if 'answer' in response_data:
                     message_instance = Message.objects.create(
                         message=user_msg,
                         bot_response=response_data['answer'],
-                        user=user_msg_serializer.validated_data['user']
+                        user_id=user_pk  # Use user_id to set FK
                     )
                     return Response({"answer": response_data['answer']}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "The response did not contain an answer."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response({"error": "Failed to get a valid response from the service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         except requests.exceptions.RequestException as e:
             print('Error:', e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-       
+    
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
