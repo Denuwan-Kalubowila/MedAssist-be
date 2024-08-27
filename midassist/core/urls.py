@@ -14,4 +14,5 @@ urlpatterns = [
     path('users/', views.user_details, name="users"),
     path('upload_pdf/', views.post_pdf),
     path('chat/', views.chat, name="chat"),
+    path('chexnet/', views.post_chexnet_image, name="chexnet"),
 ]

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -15,6 +16,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_doctor', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -33,6 +35,7 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+
 class Image(models.Model):
     image = models.ImageField(upload_to='post_images')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -40,12 +43,22 @@ class Image(models.Model):
     def __str__(self):
         return str(self.image)
 
+
+class CheXNet_Image(models.Model):
+    image = models.ImageField(upload_to='cheXNet_image')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.image)
+
+
 class Pdf(models.Model):
     pdf_file = models.FileField(upload_to='post_pdfs')  # Change from ImageField to FileField
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.pdf_file)
+
 
 class Doctor(models.Model):
     id = models.AutoField(primary_key=True)
@@ -66,5 +79,6 @@ class Message(models.Model):
     message = models.TextField()
     bot_response = models.TextField(default="Some String")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
     def __str__(self):
         return self.message
