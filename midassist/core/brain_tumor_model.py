@@ -54,21 +54,3 @@ def predict(image_path):
     predicted_class = np.argmax(output_data)
     return predicted_class
 
-# image_path = "../media/post_images/41598_2023_41576_Fig1_HTML.jpg"  # Replace with the path to your image
-# input_image = preprocess_image(image_path)
-# predict(image_path)
-
-# # Set the input tensor
-# interpreter.set_tensor(input_details[0]['index'], input_image)
-#
-# # Invoke the interpreter
-# interpreter.invoke()
-#
-# # Get the output tensor
-# output_data = interpreter.get_tensor(output_details[0]['index'])
-#
-# # Print the output
-# print("Output:", output_data)
-#
-# predicted_class = np.argmax(output_data)
-# print("Predicted class:", predicted_class)

@@ -9,12 +9,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from .CheXNet_model import predict_chexnet
 from .brain_tumor_model import predict
 from .extract_text import extract_text_from_pdf
-from .gemini_api import model
 from rest_framework.request import Request
-from .models import Image, User, Doctor,Message
-from .serializers import ImageSerializer, PdfSerializer,MessageSerializer
+
+from .models import Image, User, Doctor, Message, ChexnetImage
+from .serializers import ImageSerializer, PdfSerializer, MessageSerializer, CheXNet_ImageSerializer
 from .serializers import UserSerializer, DoctorSerializer
 from .extract_text import extract_text_from_pdf
 from requests.exceptions import ConnectionError
@@ -118,14 +119,14 @@ def post_image(request):
         posts_serializer.save()
         image_path = posts_serializer.instance.image.path  # Get the path of the saved image
         predicted_class = predict(image_path)
-        if predicted_class==0:
-            p_name="glioma"
-        elif predicted_class==1:
-            p_name="meningioma"
-        elif predicted_class==2:
-            p_name="notumor"
-        elif predicted_class==3:
-            p_name="pituitary"
+        if predicted_class == 0:
+            p_name = "glioma"
+        elif predicted_class == 1:
+            p_name = "meningioma"
+        elif predicted_class == 2:
+            p_name = "notumor"
+        elif predicted_class == 3:
+            p_name = "pituitary"
         response_data = {
             'image': posts_serializer.data,
             'predicted_class': p_name
@@ -174,6 +175,7 @@ def post_pdf(request):
     else:
         return Response({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 @api_view(['POST'])
 def post_doctor(request):
     """
@@ -187,6 +189,7 @@ def post_doctor(request):
         print('error', doctor_serializer.errors)
         return Response(doctor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 def doctors_view(request):
     """
@@ -196,6 +199,7 @@ def doctors_view(request):
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def get_doctotrs_by_review(request):
     """
@@ -203,7 +207,7 @@ def get_doctotrs_by_review(request):
     """
     doctors = Doctor.objects.all().order_by('reviews')[:10]
     serializer = DoctorSerializer(doctors, many=True)
-    return  Response(serializer.data)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -221,7 +225,7 @@ def chat(request):
             "question": user_msg
         }
         try:
-            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)    
+            response = requests.post(os.getenv('CLOUD_RUN_URL'), json=payload)
             if response.status_code == 200:
                 response_data = response.json()
                 if 'answer' in response_data:
@@ -232,13 +236,45 @@ def chat(request):
                     )
                     return Response({"answer": response_data['answer']}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"error": "The response did not contain an answer."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response({"error": "The response did not contain an answer."},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                return Response({"error": "Failed to get a valid response from the service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({"error": "Failed to get a valid response from the service."},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except requests.exceptions.RequestException as e:
             print('Error:', e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-       
+
     else:
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def post_chexnet_image(request):
+    serializer = CheXNet_ImageSerializer(data=request.data)
+    if serializer.is_valid():
+        # Save the image to the database
+        image_instance = serializer.save()
+
+        # Get the path of the saved image
+        image_path = image_instance.image.path
+
+        try:
+            # Make a prediction using the ONNX model
+            predicted_class = predict_chexnet(image_path)
+
+            # Return the prediction along with the image data
+            return Response({
+                'image': CheXNet_ImageSerializer(image_instance).data,
+                'predicted_class': predicted_class
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            # Handle errors during prediction
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # If the serializer is not valid, return the errors
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
