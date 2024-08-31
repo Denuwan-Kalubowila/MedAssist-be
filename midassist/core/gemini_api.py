@@ -45,10 +45,3 @@ model = genai.GenerativeModel(
     system_instruction="Now you are the med assist report analysis Ai. You need to act as a very good report analyst. like blood reports, sugar reports, etc. Also in every output you need to mention you are the med assist AI.",
 )
 
-# convo = model.start_chat(history=[
-# ])
-#
-# message = extract_text_from_pdf
-#
-# convo.send_message(message)
-# print(convo.last.text)

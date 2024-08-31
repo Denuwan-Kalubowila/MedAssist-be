@@ -1,55 +1,63 @@
-# import os
-# import django
-# import numpy as np
-# import tensorflow as tf
-# import cv2
-# import pathlib
-#
-# from django.conf import settings
-#
-# import sys
-#
-# BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
-# sys.path.append(str(BASE_DIR))
-#
-# # Ensure Django settings are loaded
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'midassist.settings')
-# django.setup()
-#
-#
-# def load_model():
-#     model_path = settings.CheXNet_MODEL_PATH
-#     if not os.path.exists(model_path):
-#         raise ValueError(f"Could not open '{model_path}'")
-#
-#     # Load the H5 model using TensorFlow/Keras
-#     model = tf.keras.models.load_model(model_path)
-#     return model
-#
-#
-# # Preprocess the input image
-# def preprocess_image(image_path):
-#     # Load the image
-#     img = cv2.imread(image_path)
-#
-#     # Resize the image to the required input size of the model (150x150)
-#     img = cv2.resize(img, (150, 150))
-#
-#     # Normalize the image to have values between 0 and 1
-#     img = img.astype(np.float32) / 255.0
-#
-#     # Add a batch dimension (1, 150, 150, 3)
-#     img = np.expand_dims(img, axis=0)
-#
-#     return img
-#
-#
-# def predict(image_path):
-#     model = load_model()
-#     input_image = preprocess_image(image_path)
-#
-#     # Use the model to predict the class
-#     output_data = model.predict(input_image)
-#     predicted_class = np.argmax(output_data)
-#
-#     return predicted_class
+import os
+import django
+import numpy as np
+import onnxruntime as ort
+
+import cv2
+import pathlib
+from django.conf import settings
+import sys
+
+# Setup Django environment
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'midassist.settings')
+django.setup()
+
+# Define the ONNX model path
+model_path = os.path.join(BASE_DIR, 'models', 'CheXNet.onnx')
+
+def load_model():
+    if not os.path.exists(model_path):
+        raise ValueError(f"Could not open '{model_path}'")
+
+    # Load the ONNX model using onnxruntime
+    session = ort.InferenceSession(model_path)
+    return session
+
+# Preprocess the input image
+def preprocess_image(image_path):
+    # Load the image
+    img = cv2.imread(image_path)
+
+    # Resize the image to the required input size of the model (224x224)
+    img = cv2.resize(img, (224, 224))
+
+    # Convert the image from BGR (OpenCV format) to RGB
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # Normalize the image to have values between 0 and 1
+    img = img.astype(np.float32) / 255.0
+
+    # Reorder dimensions from (224, 224, 3) to (3, 224, 224)
+    img = np.transpose(img, (2, 0, 1))
+
+    # Add a batch dimension (1, 3, 224, 224)
+    img = np.expand_dims(img, axis=0)
+
+    return img
+
+def predict_chexnet(image_path):
+    session = load_model()
+    input_image = preprocess_image(image_path)
+
+    # Run the model on the input image
+    input_name = session.get_inputs()[0].name
+    output_name = session.get_outputs()[0].name
+    output_data = session.run([output_name], {input_name: input_image})[0]
+
+    # Assuming the output is a classification result
+    predicted_class = np.argmax(output_data)
+
+    return predicted_class

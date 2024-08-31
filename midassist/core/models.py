@@ -44,7 +44,7 @@ class Image(models.Model):
         return str(self.image)
 
 
-class CheXNet_Image(models.Model):
+class ChexnetImage(models.Model):
     image = models.ImageField(upload_to='cheXNet_image')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -69,7 +69,7 @@ class Doctor(models.Model):
     about = models.CharField(max_length=45)
     time = models.CharField(max_length=20)
     experience = models.CharField(max_length=5)
-    reviews = models.IntegerField()
+    reviews = models.IntegerField(default=0)
 
     def __str__(self):
         return self.email
@@ -78,7 +78,7 @@ class Doctor(models.Model):
 class Message(models.Model):
     message = models.TextField()
     bot_response = models.TextField(default="Some String")
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default=1)
 
     def __str__(self):
         return self.message

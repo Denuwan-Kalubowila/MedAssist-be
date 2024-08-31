@@ -9,11 +9,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from .CheXNet_model import predict_chexnet
 from .brain_tumor_model import predict
 from .extract_text import extract_text_from_pdf
-from .gemini_api import model
 from rest_framework.request import Request
-from .models import Image, User, Doctor, Message
+
+from .models import Image, User, Doctor, Message, ChexnetImage
 from .serializers import ImageSerializer, PdfSerializer, MessageSerializer, CheXNet_ImageSerializer
 from .serializers import UserSerializer, DoctorSerializer
 from .extract_text import extract_text_from_pdf
@@ -249,9 +250,8 @@ def chat(request):
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['POST'])
-def post_chexnet_image(self, request, *args, **kwargs):
+def post_chexnet_image(request):
     serializer = CheXNet_ImageSerializer(data=request.data)
     if serializer.is_valid():
         # Save the image to the database
@@ -260,13 +260,21 @@ def post_chexnet_image(self, request, *args, **kwargs):
         # Get the path of the saved image
         image_path = image_instance.image.path
 
-        # Make a prediction using the H5 model
-        predicted_class = predict(image_path)
+        try:
+            # Make a prediction using the ONNX model
+            predicted_class = predict_chexnet(image_path)
 
-        # Return the prediction along with the image data
-        return Response({
-            'image': CheXNet_ImageSerializer(image_instance).data,
-            'predicted_class': predicted_class
-        }, status=status.HTTP_201_CREATED)
+            # Return the prediction along with the image data
+            return Response({
+                'image': CheXNet_ImageSerializer(image_instance).data,
+                'predicted_class': predicted_class
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            # Handle errors during prediction
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # If the serializer is not valid, return the errors
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

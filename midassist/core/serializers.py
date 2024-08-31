@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Doctor, CheXNet_Image
+from .models import User, Doctor, ChexnetImage
 from .models import Message
 from .models import Pdf
 from .models import Image
@@ -19,7 +19,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class CheXNet_ImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CheXNet_Image
+        model = ChexnetImage
         fields = '__all__'
 
 
