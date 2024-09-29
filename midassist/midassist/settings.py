@@ -1,6 +1,8 @@
 """The main setting file of MedAssist programme"""
 import os
 from pathlib import Path
+
+from django.conf import settings
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,3 +107,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'Brain_Tumor1.tflite')
+
+MODEL_PATH2 = os.path.join(BASE_DIR, 'models', 'CheXNet.onnx')
+
+
