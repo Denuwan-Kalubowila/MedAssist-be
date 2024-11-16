@@ -59,7 +59,7 @@ def logout_view(request):
     """
     global user_id
     user_id = 0
-    print(user_id)
+    # print(user_id)
     logout(request)
     return Response({'success': 'Logged out successfully'})
 
@@ -83,7 +83,7 @@ def user_details(request):
     Retrieve details of the logged-in user
     """
     global user_id
-    print(user_id)
+    # print(user_id)
     if user_id:
         user = User.objects.filter(id=user_id).first()
         if user:
@@ -129,7 +129,7 @@ def post_image(request):
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     else:
-        print('error', posts_serializer.errors)
+        # print('error', posts_serializer.errors)
         return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -147,7 +147,7 @@ def post_pdf(request):
             message = pdf_text  # Pass the extracted text as input
             convo.send_message(message)
             response = convo.last.text
-            print(response)
+            # print(response)
 
             post_data = {'pdf_file': pdf_file, 'user': user}
             post_serializer = PdfSerializer(data=post_data)
@@ -165,7 +165,7 @@ def post_pdf(request):
                             status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except Exception as e:
             # Handle other errors
-            print("Error:", e)
+            # print("Error:", e)
             return Response({"message": "An error occurred while processing your request."},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
@@ -182,7 +182,7 @@ def post_doctor(request):
         doctor_serializer.save()
         return Response(doctor_serializer.data, status=status.HTTP_201_CREATED)
     else:
-        print('error', doctor_serializer.errors)
+        # print('error', doctor_serializer.errors)
         return Response(doctor_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -238,11 +238,11 @@ def chat(request):
                 return Response({"error": "Failed to get a valid response from the service."},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except requests.exceptions.RequestException as e:
-            print('Error:', e)
+            # print('Error:', e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     else:
-        print('Error:', user_msg_serializer.errors)
+        # print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
