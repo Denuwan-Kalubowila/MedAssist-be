@@ -8,12 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from .CheXNet_model import predict_chexnet
 from .brain_tumor_model import predict
-from .extract_text import extract_text_from_pdf
 from rest_framework.request import Request
-
 from .models import Image, User, Doctor, Message, ChexnetImage
 from .serializers import ImageSerializer, PdfSerializer, MessageSerializer, CheXNet_ImageSerializer
 from .serializers import UserSerializer, DoctorSerializer
@@ -46,7 +43,7 @@ def login_view(request):
     if user:
         if user.password == password:
             user_id = user.id
-            print(user_id)
+            # print(user_id)
             return Response({'message': 'Login successful', 'user_id': user_id}, status=200)
         else:
             return Response({'error': 'Incorrect password'}, status=401)
@@ -65,7 +62,6 @@ def logout_view(request):
     print(user_id)
     logout(request)
     return Response({'success': 'Logged out successfully'})
-
 
 @api_view(['POST'])
 @csrf_exempt
@@ -117,7 +113,7 @@ def post_image(request):
     posts_serializer = ImageSerializer(data=request.data)
     if posts_serializer.is_valid():
         posts_serializer.save()
-        image_path = posts_serializer.instance.image.path  # Get the path of the saved image
+        image_path = posts_serializer.instance.image.path
         predicted_class = predict(image_path)
         if predicted_class == 0:
             p_name = "glioma"
@@ -249,32 +245,25 @@ def chat(request):
         print('Error:', user_msg_serializer.errors)
         return Response(user_msg_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def post_chexnet_image(request):
     serializer = CheXNet_ImageSerializer(data=request.data)
     if serializer.is_valid():
-        # Save the image to the database
         image_instance = serializer.save()
 
-        # Get the path of the saved image
         image_path = image_instance.image.path
 
         try:
-            # Make a prediction using the ONNX model
             predicted_class = predict_chexnet(image_path)
 
-            # Return the prediction along with the image data
             return Response({
                 'image': CheXNet_ImageSerializer(image_instance).data,
                 'predicted_class': predicted_class
             }, status=status.HTTP_201_CREATED)
         except Exception as e:
-            # Handle errors during prediction
             return Response({
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # If the serializer is not valid, return the errors
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
