@@ -1,5 +1,9 @@
 """This module providing  url array of MedAssist"""
 from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from . import views
 
@@ -15,4 +19,6 @@ urlpatterns = [
     path('upload_pdf/', views.post_pdf),
     path('chat/', views.chat, name="chat"),
     path('chexnet/', views.post_chexnet_image, name="chexnet"),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
