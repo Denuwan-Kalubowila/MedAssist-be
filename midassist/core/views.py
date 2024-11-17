@@ -2,7 +2,6 @@
 This is the view of core module
 """
 import os
-
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -19,6 +18,11 @@ from requests.exceptions import ConnectionError
 import requests
 from .gemini_api import model
 from dotenv import load_dotenv
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
 
 load_dotenv()
 
@@ -26,55 +30,62 @@ load_dotenv()
 
 user_id = 0
 
-
 @api_view(['POST'])
-@csrf_exempt
 def login_view(request):
     """
-        this method use for login
+    Login and return JWT tokens
     """
-    global user_id
-
     email = request.data.get('email')
     password = request.data.get('password')
 
-    user = User.objects.filter(email=email).first()
-
+    # Authenticate user
+    user = authenticate(request, email=email, password=password)
     if user:
-        if user.password == password:
-            user_id = user.id
-            # print(user_id)
-            return Response({'message': 'Login successful', 'user_id': user_id}, status=200)
-        else:
-            return Response({'error': 'Incorrect password'}, status=401)
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
     else:
-        return Response({'error': 'Email not found'}, status=404)
+        return Response({'detail': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
-@csrf_exempt
 def logout_view(request):
     """
-        this method use for logout
+    Logout and blacklist the user's refresh token
     """
-    global user_id
-    user_id = 0
-    # print(user_id)
-    logout(request)
-    return Response({'success': 'Logged out successfully'})
+    try:
+        refresh_token = request.data['refresh']
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({'success': 'Logged out successfully'}, status=200)
+    except Exception as e:
+        return Response({'error': 'Invalid token'}, status=400)
 
 @api_view(['POST'])
-@csrf_exempt
 def signup_view(request):
     """
-        this method use for Signup
+    Signup and create a new user
     """
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    email = request.data.get('email')
+    user_check = User.objects.filter(email=email).first()
+    # print(user_check)
+    if user_check:
+        return Response({'detail': 'Email is already exist'}, status=400)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = serializer.save()
+                user.set_password(request.data['password'])  # Hash password
+                user.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
