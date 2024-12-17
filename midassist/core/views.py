@@ -272,9 +272,18 @@ def post_chexnet_image(request):
         try:
             predicted_class = predict_chexnet(image_path)
 
+            # Map the predicted class to a label
+            class_labels = {
+                0: "NORMAL",
+                1: "PNEUMONIA"
+            }
+
+            # Get the label or use "UNKNOWN" if the class is not recognized
+            predicted_label = class_labels.get(predicted_class, "UNKNOWN")
+
             return Response({
                 'image': CheXNet_ImageSerializer(image_instance).data,
-                'predicted_class': predicted_class
+                'predicted_class': predicted_label
             }, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({
